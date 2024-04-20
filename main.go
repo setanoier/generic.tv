@@ -18,7 +18,7 @@ func readStringFromFile(filename string) string {
 
 func main() {
 	accessToken := readStringFromFile(".client") // access token is oauth token of bot account
-	client := twitch.NewClient("setanoier", accessToken)
+	client := twitch.NewClient("yourTwitch", accessToken)
 
 	client.OnPrivateMessage(func(message twitch.PrivateMessage) {
 		fmt.Println(message.Message)
@@ -27,7 +27,7 @@ func main() {
 		}
 	})
 
-	client.Join("setanoier")
+	client.Join("yourTwitch")
 
 	err := client.Connect()
 	if err != nil {
