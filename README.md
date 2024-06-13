@@ -1,5 +1,8 @@
 # Generic Twitch Chat Bot
-Multipurpose twitch chat bot.
+This bot canbe used for:
+- Find out the weather by given by latitude and longitude
+- To hold a drawing with a certain duration
+- TBA
 
 To install required library locally:
 ```Shell
