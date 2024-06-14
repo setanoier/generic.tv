@@ -1,4 +1,4 @@
-# Generic Twitch Chatbot
+# Generic Twitch Chatbot - GTC
 This bot can be used for:
 - Find out the weather by given latitude and longitude or in some city (https://open-meteo.com/, no API key required)
 - To hold a drawing with a certain duration
