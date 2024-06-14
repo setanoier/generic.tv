@@ -8,3 +8,4 @@ To install required library locally:
 ```Shell
 go get github.com/gempir/go-twitch-irc/v4
 ```
+Here you can grab an OAuth token for your bot account: https://twitchapps.com
