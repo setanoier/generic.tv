@@ -113,7 +113,7 @@ func main() {
 				isDrawing = false
 				keys := reflect.ValueOf(players).MapKeys()
 				winner := keys[rand.Intn(len(keys))].String()
-				client.Say(message.Channel, fmt.Sprintf("Winner: ", winner))
+				client.Say(message.Channel, fmt.Sprintf("Winner: %s", winner))
 				players = make(map[string]bool)
 			}()
 		}
