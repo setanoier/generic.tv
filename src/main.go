@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/go-resty/resty/v2"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"math/rand"
 	"os"
@@ -13,6 +16,39 @@ import (
 	"strings"
 	"time"
 )
+
+func main() {
+	db, err := sql.Open("sqlite3", "../data/towns.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	createTableSQL := `CREATE TABLE IF NOT EXISTS towns (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL
+    );`
+
+	_, err = db.Exec(createTableSQL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Database and table create successfully")
+
+	accessToken := readStringFromFile("../data/oauth") // Access token is OAuth token of the bot account
+	client := twitch.NewClient("setanoier", accessToken)
+	admin := "setanoier"
+	response(client, admin)
+
+	client.Join("setanoier")
+
+	if err := client.Connect(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func readStringFromFile(filename string) string {
 	data, err := os.ReadFile(filename)
@@ -53,9 +89,7 @@ func getWeather() (string, error) {
 	return fmt.Sprintf("Current temperature: %d°C", temperature), nil
 }
 
-func main() {
-	accessToken := readStringFromFile("../data/oauth") // Access token is OAuth token of the bot account
-	client := twitch.NewClient("setanoier", accessToken)
+func response(client *twitch.Client, admin string) {
 	isDrawing := false
 	players := make(map[string]bool)
 
@@ -73,8 +107,7 @@ func main() {
 				client.Say(message.Channel, weather)
 			}
 
-		case message.Message == "!drawing" && isDrawing:
-			fmt.Println(message.User.Name)
+		case message.Message == "!drawing" && isDrawing && message.User.Name != admin:
 			if !players[message.User.Name] {
 				players[message.User.Name] = true
 			} else {
@@ -82,15 +115,20 @@ func main() {
 			}
 
 		case strings.HasPrefix(message.Message, "!drawing"):
+			if message.User.Name != admin {
+				client.Say(message.Channel, "You do not have appropriate rights to start this event")
+				return
+			}
+
 			tokens := strings.Split(message.Message, " ")
 			if len(tokens) != 2 {
-				client.Say(message.Channel, "Usage: !drawing <minutes:seconds>.")
+				client.Say(message.Channel, "Usage: !drawing minutes:seconds.")
 				return
 			}
 
 			durationParts := strings.Split(tokens[1], ":")
 			if len(durationParts) != 2 {
-				client.Say(message.Channel, "Invalid time format: Use <minutes:seconds>.")
+				client.Say(message.Channel, "Invalid time format: Use minutes:seconds.")
 				return
 			}
 
@@ -101,7 +139,7 @@ func main() {
 				return
 			}
 
-			duration := time.Duration(minutes)*time.Minute + time.Duration(seconds)*time.Minute
+			duration := time.Duration(minutes)*time.Minute + time.Duration(seconds)*time.Second
 
 			client.Say(message.Channel, "The drawing has begun!")
 			isDrawing = true
@@ -118,11 +156,27 @@ func main() {
 			}()
 		}
 	})
+}
 
-	client.Join("setanoier")
-
-	err := client.Connect()
+func insertTown(db *sql.DB, name string, latitude, longitude float64) {
+	insertSQL := `INSERT INTO towns (name, latitude, longitude) VALUES (?, ?, ?)`
+	_, err := db.Exec(insertSQL, name, latitude, longitude)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Added: ", name)
+}
+
+func getCoordinatesByTown(db *sql.DB, townName string) (float64, float64, error) {
+	var latitude, longitude float64
+	query := `SELECT latitude, longitude FROM towns WHERE name = ?`
+	row := db.QueryRow(query, townName)
+	err := row.Scan(&latitude, &longitude)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, 0, fmt.Errorf("no town found with name %s", townName)
+		}
+		return 0, 0, err
+	}
+	return latitude, longitude, nil
 }
