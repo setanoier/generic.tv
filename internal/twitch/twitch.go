@@ -27,7 +27,7 @@ func response(client *twitch.Client, admin string) {
 
 		case message.Message == "!weather":
 			tokens := strings.Split(message.Message, " ")
-			weather, err := weather.GetWeather(tokens)
+			weather, err := weather.GetWeather(tokens[1])
 
 			if err != nil {
 				client.Say(message.Channel, "Failed to get weather information.")
