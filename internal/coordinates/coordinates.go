@@ -8,45 +8,57 @@ import (
 	"net/url"
 )
 
-type GeoFeature struct {
-	Geometry GeoGeometry `json:"geometry"`
+// Define a structure for the JSON response
+type GeocodingResponse struct {
+	Features []struct {
+		Geometry struct {
+			Coordinates []float64 `json:"coordinates"`
+		} `json:"geometry"`
+	} `json:"features"`
 }
 
-type GeoGeometry struct {
-	Coordinates []float64 `json:"coordinates"`
-}
+// GetCityCoordinates fetches the coordinates of a city from the MapTiler Geocoding API
+func GetCityCoordinates(city, apiKey string) (float64, float64, error) {
+	// Construct the request URL
+	baseURL := "https://api.maptiler.com/geocoding/"
+	query := url.QueryEscape(city)
+	fullURL := fmt.Sprintf("%s%s.json?key=%s", baseURL, query, apiKey)
 
-func GetCoordinatesByTown(town, apiKey string) (float64, float64, error) {
-	encodedTownName := url.QueryEscape(town)
-
-	apiURL := fmt.Sprintf("https://api.maptiler.com/geocoding/%s.json?key=%s", encodedTownName, apiKey)
-
-	resp, err := http.Get(apiURL)
+	// Make the HTTP GET request
+	resp, err := http.Get(fullURL)
 	if err != nil {
-		return 0, 0, fmt.Errorf("error making GET request: %v", err)
+		return 0, 0, fmt.Errorf("failed to make request: %v", err)
 	}
 	defer resp.Body.Close()
 
+	// Check if the request was successful
+	if resp.StatusCode != http.StatusOK {
+		return 0, 0, fmt.Errorf("received non-200 response status: %s", resp.Status)
+	}
+
+	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return 0, 0, fmt.Errorf("error reading response body: %v", err)
+		return 0, 0, fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	var geoFeature GeoFeature
-	err = json.Unmarshal(body, &geoFeature)
+	// Parse the JSON response
+	var geocodingResponse GeocodingResponse
+	err = json.Unmarshal(body, &geocodingResponse)
 	if err != nil {
-		return 0, 0, fmt.Errorf("error decoding JSON: %v", err)
+		return 0, 0, fmt.Errorf("failed to unmarshal JSON response: %v", err)
 	}
 
-	coordinates := geoFeature.Geometry.Coordinates
+	// Check if any features were returned
+	if len(geocodingResponse.Features) == 0 {
+		return 0, 0, fmt.Errorf("no coordinates found for city: %s", city)
+	}
+
+	// Extract the coordinates
+	coordinates := geocodingResponse.Features[0].Geometry.Coordinates
 	if len(coordinates) < 2 {
-		return 0, 0, fmt.Errorf("no coordinates found in response")
+		return 0, 0, fmt.Errorf("incomplete coordinates data for city: %s", city)
 	}
 
-	fmt.Println(1)
-
-	latitude := coordinates[1]
-	longitude := coordinates[0]
-
-	return latitude, longitude, nil
+	return coordinates[1], coordinates[0], nil // lat, lng
 }
