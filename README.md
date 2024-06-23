@@ -8,4 +8,4 @@ This bot can be used for:
 ## How to Deploy Locally
 1. Here you can grab an OAuth token for your bot account: https://twitchapps.com
 2. Google API key: https://console.cloud.google.com/apis/credentials
-3. YouTuve Data API v3 (should be enabled): https://console.cloud.google.com/apis/library/youtube.googleapis.com
+3. YouTube Data API v3 (should be enabled): https://console.cloud.google.com/apis/library/youtube.googleapis.com
