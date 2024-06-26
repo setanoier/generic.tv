@@ -31,18 +31,12 @@ func GetCityCoordinates(city, apiKey string) (float64, float64, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check if the request was successful
-	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("received non-200 response status: %s", resp.Status)
-	}
-
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	// Parse the JSON response
 	var geocodingResponse GeocodingResponse
 	err = json.Unmarshal(body, &geocodingResponse)
 	if err != nil {
@@ -57,7 +51,7 @@ func GetCityCoordinates(city, apiKey string) (float64, float64, error) {
 	// Extract the coordinates
 	coordinates := geocodingResponse.Features[0].Geometry.Coordinates
 	if len(coordinates) < 2 {
-		return 0, 0, fmt.Errorf("incomplete coordinates data for city: %s", city)
+		return 0, 0, fmt.Errorf("non-valid coordinates for city: %s", city)
 	}
 
 	return coordinates[1], coordinates[0], nil // lat, lng

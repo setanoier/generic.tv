@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"generic.tv/internal/utils"
 	"generic.tv/internal/weather"
+	"generic.tv/internal/youtube"
 	"log"
 	"math/rand"
 	"os"
@@ -25,8 +26,9 @@ func response(client *twitch.Client, admin string) {
 		case message.Message == "!ping":
 			client.Say(message.Channel, "pong!\n")
 
-		case message.Message == "!weather":
+		case strings.HasPrefix(message.Message, "!weather"):
 			tokens := strings.Split(message.Message, " ")
+			fmt.Println(tokens[1])
 			weather, err := weather.GetWeather(tokens[1])
 
 			if err != nil {
@@ -82,6 +84,14 @@ func response(client *twitch.Client, admin string) {
 				client.Say(message.Channel, fmt.Sprintf("Winner: %s", winner))
 				players = make(map[string]bool)
 			}()
+		case message.Message == "!yt":
+			title, link, err := youtube.FetchLatestVideoLink()
+			if err != nil {
+				client.Say(message.Channel, "Something went wrong...")
+				return
+			} else {
+				client.Say(message.Channel, title+": "+link)
+			}
 		}
 	})
 }
@@ -100,5 +110,6 @@ func Start() error {
 	if err := client.Connect(); err != nil {
 		log.Fatal(err)
 	}
+
 	return nil
 }
