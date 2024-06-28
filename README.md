@@ -1,7 +1,7 @@
 # Generic Twitch Chatbot - GTC
 
 This bot can be used for:
-- Find out the weather by given city (https://open-meteo.com/, no API key required)
+- Find out the weather by given city 
 - To hold a drawing with a certain duration
 - Provide a link to the latest YouTube video from your channel 
 
