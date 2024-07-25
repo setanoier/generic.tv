@@ -3,6 +3,7 @@ package weather
 import (
 	"encoding/json"
 	"fmt"
+
 	"generic.tv/internal/coordinates"
 	"generic.tv/internal/utils"
 	"github.com/go-resty/resty/v2"
@@ -20,7 +21,6 @@ func GetWeather(town string) (string, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(latitude, longitude)
 
 	client := resty.New()
 
@@ -42,6 +42,7 @@ func GetWeather(town string) (string, error) {
 	}
 
 	temperature := int(weather.CurrentWeather.Temperature)
+	emoji := utils.GetWeatherEmoji(temperature)
 
-	return fmt.Sprintf("Current temperature in %s is %d°C", town, temperature), nil
+	return fmt.Sprintf("%s current temperature in %s is %d°C", emoji, town, temperature), nil
 }
