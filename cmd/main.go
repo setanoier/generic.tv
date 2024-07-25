@@ -1,9 +1,9 @@
 package main
 
 import (
-	"generic.tv/internal/twitch"
+	"generic.tv/internal/commands"
 )
 
 func main() {
-	twitch.Start()
+	commands.Start()
 }
