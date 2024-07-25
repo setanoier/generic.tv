@@ -12,3 +12,18 @@ func ReadStringFromFile(filename string) string {
 	}
 	return string(data)
 }
+
+func GetWeatherEmoji(temp int) string {
+	switch {
+	case temp <= 13:
+		return "❄️"
+	case temp > 13 && temp <= 20:
+		return "🧥"
+	case temp > 20 && temp <= 30:
+		return "👕"
+	case temp > 30:
+		return "💀"
+	default:
+		return "???"
+	}
+}
