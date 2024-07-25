@@ -28,7 +28,11 @@ func response(client *twitch.Client, admin string) {
 
 		case strings.HasPrefix(message.Message, "!weather"):
 			tokens := strings.Split(message.Message, " ")
-			fmt.Println(tokens[1])
+
+			if len(tokens) == 1 {
+				tokens = append(tokens, "Innopolis")
+			}
+
 			weather, err := weather.GetWeather(tokens[1])
 
 			if err != nil {

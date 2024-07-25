@@ -43,5 +43,5 @@ func GetWeather(town string) (string, error) {
 
 	temperature := int(weather.CurrentWeather.Temperature)
 
-	return fmt.Sprintf("Current temperature: %d°C", temperature), nil
+	return fmt.Sprintf("Current temperature in %s is %d°C", town, temperature), nil
 }
