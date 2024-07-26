@@ -6,10 +6,12 @@ import (
 	"strings"
 
 	"generic.tv/internal/commands"
+	"generic.tv/internal/utils"
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
@@ -94,6 +96,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
+				db, _ := utils.OpenDB()
+
+				_ = utils.Insert(db, m.inputs[0].Value(), m.inputs[1].Value(),
+					m.inputs[2].Value(), m.inputs[3].Value())
 
 				return m, tea.Quit
 			}
@@ -172,6 +178,18 @@ func (m model) View() string {
 }
 
 func main() {
+	db, err := utils.OpenDB()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = utils.CreateTable(db)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
 		log.Fatal(err)
 	}
