@@ -16,7 +16,7 @@ type WeatherResponse struct {
 }
 
 func GetWeather(town string) (string, error) {
-	apiKey := utils.ReadStringFromFile("../data/api.txt")
+	apiKey := utils.ReadStringFromFile("../storage/api.txt")
 	latitude, longitude, err := coordinates.GetCityCoordinates(town, apiKey)
 	if err != nil {
 		fmt.Println(err)

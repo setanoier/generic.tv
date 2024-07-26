@@ -3,10 +3,11 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
-	"generic.tv/internal/utils"
 	"io"
 	"net/http"
 	"net/url"
+
+	"generic.tv/internal/utils"
 )
 
 // Video represents the structure of a video item in the YouTube API response
@@ -26,7 +27,7 @@ type YouTubeResponse struct {
 
 // FetchLatestVideoLink returns the link to the latest video from the specified YouTube channel
 func FetchLatestVideoLink() (string, string, error) {
-	apiKey := utils.ReadStringFromFile("../data/gapi.txt")
+	apiKey := utils.ReadStringFromFile("../storage/gapi.txt")
 	channelID := "UCGlYKd-FR4g0Tp4wF6_wxig"
 	baseURL := "https://www.googleapis.com/youtube/v3/search"
 	params := url.Values{}

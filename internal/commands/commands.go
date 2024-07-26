@@ -101,10 +101,10 @@ func Response(client *twitch.Client, admin string) {
 }
 
 func Start() error {
-	if _, err := os.Stat("../data/oauth.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat("../storage/oauth.txt"); os.IsNotExist(err) {
 		// Handle case when oauth.txt does not exist
 	}
-	accessToken := utils.ReadStringFromFile("../data/oauth.txt") // Access token is OAuth token of the bot account
+	accessToken := utils.ReadStringFromFile("../storage/oauth.txt") // Access token is OAuth token of the bot account
 	client := twitch.NewClient("setanoier", accessToken)
 	admin := "setanoier"
 	Response(client, admin)
