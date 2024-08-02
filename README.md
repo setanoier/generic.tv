@@ -4,6 +4,7 @@
 
 - `!ping` - if the bot is working, just reply with pong!
 - `!weather "city"` - displays the weather in the specified city (by default Innopolis)
+- `!drawing min:sec` - provide an opportunity to hold a drawing with certain duration
 - `!yt` - displays a link to the latest YouTube video from specified channel
 
 ## Deployment
